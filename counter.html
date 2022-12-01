@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="English-US">
+    <head>
+        <meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <title></title>
+    </head>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+                    $('#minus').on('click', subtract);
+                    $('#plus').on('click', add);
+                    $('#clear').on('click', clearCounter);
+
+
+                    user = { "user" : document.getElementById("UserID").innerHTML}
+                    console.log(user)
+
+                    $.ajax({
+                    type:        'POST',
+                    url:         '/counter.html',
+                    data:        user,
+                    success:     (data) => {  
+                                                console.log(data)
+                                                $("#counter").html(data);
+                                                value = parseInt(data)
+                                            }
+                        });
+        });
+    </script>
+    <style>
+        .button {
+            width: 50px;
+        }
+        #User {
+            text-align: center;
+            font-size: 40px;
+        }
+        #UserID {
+            font-size: 24px;
+            padding: 5px;
+        }
+        #counterDiv {
+            text-align: center;
+            font-size: 30px;
+        }
+        #counter {
+            border-width:2px;
+            border-style:solid;
+            border-color:black;
+            width: 200px;
+            height: 40px;
+            font-size: 30px;
+            text-align: center;
+            padding: 50px;
+            margin-top: 20px;
+            margin-left: auto;
+            margin-right: auto;
+
+        }
+    </style>
+
+
+    <div id="User">
+        <header><u>User</u></header>
+        <div id="UserID">admin</div>
+    </div>    
+    <div id="counterDiv">
+        <div id="counter">0</div>
+        <input class="button" type="button" id="minus" value="-" >
+        <input class="button" type="button" id="clear" value="clear" >
+        <input class="button" type="button" id="plus" value="+" >
+    </div>
+
+
+
+    <script>
+        //value = parseInt(document.getElementById("counter").innerHTML)
+
+
+        function subtract() {
+            // value = value-1
+            // $('#counter').html(value);
+            // return value;
+
+            let order = {"user": document.getElementById("UserID").innerHTML, "command": -1}
+
+            $.ajax({
+                    type:        'POST',
+                    url:         '/count',
+                    data:        order,
+                    success:     (data) => {  
+                                                console.log(data)
+                                                $("#counter").html(data);
+                                                value = parseInt(data)
+                                            }
+            });
+        }
+
+        function add() {
+            // value = value+1
+            // $('#counter').html(value);
+            // return value;
+
+            let order = {"user": document.getElementById("UserID").innerHTML, "command": 1}
+
+            $.ajax({
+                    type:        'POST',
+                    url:         '/count',
+                    data:        order,
+                    success:     (data) => {  
+                                                console.log(data)
+                                                $("#counter").html(data);
+                                                value = parseInt(data)
+                                            }
+            });
+        }
+        function clearCounter() {
+            // value = 0
+            // $('#counter').html(value);
+            // return value
+
+            let order = {"user": document.getElementById("UserID").innerHTML, "command": 0}
+
+            $.ajax({
+                    type:        'POST',
+                    url:         '/count',
+                    data:        order,
+                    success:     (data) => {  
+                                                console.log(data)
+                                                $("#counter").html(data);
+                                                value = parseInt(data)
+                                            }
+            });
+        }
+    </script>
+</html>
