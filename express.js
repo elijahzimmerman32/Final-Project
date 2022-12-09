@@ -24,9 +24,6 @@ const { time } = require('console');
 const { json } = require('express');
 const config = {MaxLoginTries: 5, AccountLockout: 20*60*1000, SessionTimeOut: 5*60*1000}
 
-//for python code
-let {PythonShell} = require('python-shell')
-
 app.use(session({
     secret: 'keyUSEDtoHASHsessionId',  
     name:    'app.session.id',
@@ -168,19 +165,28 @@ app.post('/login.html', (req, res) => {
                 req.session.lastRequest = currentTimeSQL;
 
                 //need to update counter with correct account
-            fs.readFile(path.join(__dirname, 'webroot', 'counter.html'), 'utf8', function(err, data) {
-                if (err) {
-                    res.sendStatus(404);
-                } else {
+            // fs.readFile(path.join(__dirname, 'webroot', 'counter.html'), 'utf8', function(err, data) {
+            //     if (err) {
+            //         res.sendStatus(404);
+            //     } else {
             
-                    data = data.replace( "const user = '';", `const user = '${user}';`);
-                    res.send(data);
-                }
-            })
-                
+            //         data = data.replace( "const user = '';", `const user = '${user}';`);
+            //         res.send(data);
+            //     }
+            // })
+            if (userInfo.isAdmin == 1)
+            {
                 qs = (userInfo.isAdmin == 1) ? '?admin=1' : '';
-                res.redirect(`/counter.html${qs}`)
             }
+            else
+            {
+                qs = user ? `?user=${user}` : '';
+            }
+            
+            res.redirect(`/counter.html${qs}`)
+            }
+
+            
 
             // updating the database with badcount and last login attempt
             let sql2 = `UPDATE Counts SET badcount = ${userInfo.badcount}, lastLoginAttempt = datetime("now") WHERE user = ?`;
@@ -287,6 +293,12 @@ app.post('/count', (req, res) => {
             }
             console.log('Closed the database connection.');
     });
+});
+
+app.get('/logout.html', (req, res) => {
+    ClearSession(req);
+
+    res.redirect("/login.html")
 });
 
 app.use(express.static('webRoot'));

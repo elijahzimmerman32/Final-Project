@@ -18,8 +18,17 @@
                     $('#plus').on('click', add);
                     $('#clear').on('click', clearCounter);
 
-                    const user = '';
-                    $("#UserID").html( user );
+                    let urlParams = new URLSearchParams(window.location.search);
+                    let isAdmin = urlParams.get( 'admin' );
+                    
+                    if (isAdmin && isAdmin=="1"){
+                        $("#aAdmin").show();
+                        $("#UserID").html( 'admin' );}
+                    else
+                        $("#aAdmin").hide();
+
+                    let pageuser = urlParams.get('user');
+                    $("#UserID").html( pageuser );
 
 
                     user = { "user" : document.getElementById("UserID").innerHTML}
@@ -40,6 +49,9 @@
     <style>
         .button {
             width: 50px;
+        }
+        #actions{
+            font-size: 20px;
         }
         #User {
             text-align: center;
@@ -73,6 +85,9 @@
     <div id="User">
         <header><u>User</u></header>
         <div id="UserID"></div>
+        <!-- <div id='actions'><a href='/logout.html'>Logout</a>&nbsp;&nbsp;<a href='/admin.html' id="aAdmin">Admin</a></div> -->
+        <div id='actions'><a href='/logout.html'>Logout</a></div>
+        <div id="actions"><a href='/admin.html' id="aAdmin">Admin</a></div>
     </div>    
     <div id="counterDiv">
         <div id="counter">0</div>
