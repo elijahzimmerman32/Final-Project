@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>Counter - Administration</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    
+    <script type="text/javascript">  
+      function preventBack() { window.history.forward(); }  
+      setTimeout("preventBack()", 0);  
+      window.onunload = function () { null };  
+    </script> 
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12px;
+        }
+
+        .status {
+            margin-top: 20px;
+            font-style: italic;
+        }
+    
+        .divData {
+          display: grid;
+          grid-template-columns: min-content min-content min-content min-content;
+          grid-gap: 5px;
+          margin-top: 20px;
+          background: #f0f0f0; 
+          width: fit-content;
+        }
+
+        div.divData div { 
+          padding: 5px; 
+        }
+
+        div.divData div.head { 
+          font-weight: bold;
+        }
+
+        .results {
+          display: grid;
+          grid-template-columns:  175px 100px 250px;
+          grid-gap: 5px;
+          margin-top: 20px;
+        }
+
+        div.results div { 
+          padding: 5px; 
+          background: #f0f0f0; 
+        }
+
+        div.results div.head { 
+          font-weight: bold;
+          border-style: solid;
+          border-width: 1px;
+        }
+        div.results div.data { 
+          font-weight: lighter;
+          border-style: solid;
+          border-width: 1px;
+          border-color: grey;
+        }
+
+    </style>
+  </head>
+
+  <body>
+    <h3>Counter - Administration</h3>
+
+    <div><a href='/counter.html?admin=1'>Status</a>&nbsp;&nbsp;<a href='/logout.html'>Logout</a>&nbsp;&nbsp;Refreshing every 10 Seconds</div>
+    
+    <div class="divData">
+      <div><label for="txtUser">User&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></div>
+      <div><input type="text" id="txtUser" /></div>
+      <div><input type="button" value="Add" id="btnAdd"/></div>
+      <div><input type="button" value="Delete" id="btnDelete"/></div>
+    </div>
+    <div class="divData" id="divdata2">
+        <div id="divDatapass"><label for='UserPWD'>Password</label></div>
+        <div id="divDatapass"><input type="password" id="txtPWD" /></div>
+    </div>
+    <div class="divData" id="divdata3">
+        <div id="divDatapass"><label for='UserCPWD'>Confirm Password</label></div>
+        <div id="divDatapass"><input type="password" id="txtCPWD" /></div>
+        <div id="divDatapass"><input type="button" value="Confirm" id="btnConfirm"/></div>
+    </div>
+
+    <div class="status" id="divStatus"></div>
+    <div class="results" id="resultsDiv">
+        <div class="head">User</div>
+        <div class="head">Count</div>
+        <div class="head">Last Seen</div>
+    </div>
+  </body>
+
+  <script>
+    function Password()
+    {
+        let user = $("#txtUser").val();
+        if (user == '')
+            $("#divStatus").text( `No User Indicated`);
+        else
+        {
+            $('#divdata2').show();
+            $('#divdata3').show();
+        }
+    }
+
+    function AddUser()
+    {
+        let user = $("#txtUser").val();
+
+        $.ajax({
+        type:        'POST',
+        url:         `/adduser/${user}`,
+        success:     (data) => { 
+                $("#divStatus").text( `Added: ${data.user}`);
+                $("#txtUser").val("");
+                $('#divdata2').hide();
+                $('#divdata3').hide();
+            },
+        error: (jqXHR) => {
+            //console.log( jqXHR );
+            if (jqXHR.status == 409)
+                $("#divStatus").text( `Duplicate User: ${$("#txtUser").val()}`);
+            else
+                $("#divStatus").text( `Unexepected error: ${jqXHR.status}`);
+        }
+        });
+    }
+
+    function DeleteUser()
+    {
+        let user = $("#txtUser").val();
+
+        $.ajax({
+        type:        'DELETE',
+        url:         `/deleteuser/${user}`,
+        success:     (data) => {
+                  $("#divStatus").text( `Deleted: ${data.User}`);
+                  $("#txtUser").val("");
+            },
+        error: (jqXHR) => {
+            //console.log( jqXHR );
+            if (jqXHR.status == 404)
+                $("#divStatus").text( `User not found: ${$("#txtUser").val()}`);
+            else if (jqXHR.status == 405)
+                $("#divStatus").text( `Cannot Delete User: ${$("#txtUser").val()}`);
+            else
+                $("#divStatus").text( `Unexepected error: ${jqXHR.status}`);
+        }
+        });
+    }
+    function getData()
+    {
+        $.get("/users").done( (results) => {
+            console.log( results );
+            $('#resultsDiv .data').remove();
+
+            let options = { year: 'numeric', month: 'short', day: 'numeric' };
+
+            $.each( results, (i, e) => {
+              let lastSeen = e.LastSeen ? (new Date(e.LastSeen)).toLocaleTimeString('en-US', options) : e.LastSeen;
+              $('#resultsDiv').append( 
+                `<div class="data" data-id="${e.user}">${e.user}</div>\n<div class="data" data-id=${e.count}>${e.count}</div>\n<div class="data">${lastSeen}</div>`
+            )});
+        }).fail( () => { 
+          console.log( 'host request error');
+          window.location.href = "/login.html";
+        });
+    }
+
+    $(document).ready(function() {
+        getData();
+        setInterval(getData, 10*1000);
+        //$("#btnAdd").click( Password );
+        $("#btnDelete").click( DeleteUser );
+        //$("#btnConfirm").click( AddUser );
+        $('#divdata2').hide();
+        $('#divdata3').hide();
+    });
+</script>
+
+</html>

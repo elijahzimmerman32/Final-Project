@@ -23,16 +23,17 @@
                     
                     if (isAdmin && isAdmin=="1"){
                         $("#aAdmin").show();
-                        $("#UserID").html( 'admin' );}
-                    else
+                        $("#UserID").html( 'admin' );
+                        user = { "user" : document.getElementById("UserID").innerHTML}
+                        console.log(user)}
+
+                    else {
                         $("#aAdmin").hide();
+                        let pageuser = urlParams.get('user');
+                        $("#UserID").html( pageuser );
+                        user = { "user" : document.getElementById("UserID").innerHTML}
+                        console.log(user)}
 
-                    let pageuser = urlParams.get('user');
-                    $("#UserID").html( pageuser );
-
-
-                    user = { "user" : document.getElementById("UserID").innerHTML}
-                    console.log(user)
 
                     $.ajax({
                     type:        'POST',
@@ -87,7 +88,7 @@
         <div id="UserID"></div>
         <!-- <div id='actions'><a href='/logout.html'>Logout</a>&nbsp;&nbsp;<a href='/admin.html' id="aAdmin">Admin</a></div> -->
         <div id='actions'><a href='/logout.html'>Logout</a></div>
-        <div id="actions"><a href='/admin.html' id="aAdmin">Admin</a></div>
+        <div id="actions"><a href='/admin' id="aAdmin">Admin</a></div>
     </div>    
     <div id="counterDiv">
         <div id="counter">0</div>
