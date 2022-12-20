@@ -118,13 +118,20 @@
 
     function AddUser()
     {
-        let user = $("#txtUser").val();
+        let user =        $("#txtUser").val();
+        let password =    $('#txtPWD').val();
+        let confirmpwd =  $('#txtCPWD').val();
+
+        data = {"user" : user, "password" : password, "confirmpassword" : confirmpwd}
+        console.log(data)
 
         $.ajax({
         type:        'POST',
-        url:         `/adduser/${user}`,
+        url:         `/register.html`,
+        data:        data,
         success:     (data) => { 
                 $("#divStatus").text( `Added: ${data.user}`);
+                console.log(data.user)
                 $("#txtUser").val("");
                 $('#divdata2').hide();
                 $('#divdata3').hide();
@@ -183,9 +190,9 @@
     $(document).ready(function() {
         getData();
         setInterval(getData, 10*1000);
-        //$("#btnAdd").click( Password );
+        $("#btnAdd").click( Password );
         $("#btnDelete").click( DeleteUser );
-        //$("#btnConfirm").click( AddUser );
+        $("#btnConfirm").click( AddUser );
         $('#divdata2').hide();
         $('#divdata3').hide();
     });
